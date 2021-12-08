@@ -1,6 +1,10 @@
 import { Client, Intents, Message } from 'discord.js';
 import { joinVoiceChannel } from '@discordjs/voice';
 import { addSpeechEvent, VoiceMessage } from 'discord-speech-recognition';
+import { lookup } from './lookup';
+import { config } from 'dotenv';
+
+config();
 
 const token = process.env.LOGIN_TOKEN;
 
@@ -33,10 +37,15 @@ client.on('messageCreate', (msg: Message) => {
 });
 
 
-client.on('speech', (msg: VoiceMessage) => {
-    console.log(msg);
+client.on('speech', async (msg: VoiceMessage) => {
+    if (msg.error) {
+        console.log('Error occurred', msg.error);
+        return;
+    }
 
-    if (msg.content === 'kick') {
+    console.log(msg.content);
+    
+    if (msg.content === 'bye') {
         const member = msg.member;
 
         if (member) {
@@ -47,12 +56,26 @@ client.on('speech', (msg: VoiceMessage) => {
         return;
     }
 
-    if (msg.content?.includes('move')) {
-        const personToMove = msg.content.split(' ')[1];
+    if (msg.content?.includes('kick')) {
+        const personToKick = msg.content.split(' ')[1];
 
-        if (personToMove) {
-            
-        }
+        if (personToKick) {
+            const member = lookup(msg, personToKick);
+            if (member) {
+                member.edit({
+                    channel: null
+                });
+                console.log(`Kicked ${personToKick}`);
+                return;
+            }
+            console.log('No member found');
+            return;
+        } 
+        console.log('No one to kick');
+    }
+
+    if (msg.content?.includes('tell')) {
+        // create a message to type to a member
     }
 });
 

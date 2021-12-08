@@ -1,14 +1,22 @@
-import { GuildMember, Client, User } from 'discord.js';
+import { VoiceMessage } from 'discord-speech-recognition';
+import { GuildMember } from 'discord.js';
 
 const lookupTable: Record<string, GuildMember> = {};
 
-export function lookup(client: Client, name: string): GuildMember | null  {
+export function lookup(message: VoiceMessage, name: string): GuildMember | null  {
     if (lookupTable[name]) {
         return lookupTable[name];
     } else {
-        const userId= client.users.cache.find((user: User) => user.username === name)?.id;
-        
-        // get guild member from user id
+        const member = message.guild.members.cache.find((curMember: GuildMember): boolean => {
+            if (curMember.displayName.includes(name) || curMember.nickname?.includes(name)) {
+                return true;
+            }
+            return false;
+        });
+
+        if (member) {
+            lookupTable[name] = member;
+        }
     }
     return null;
 }
