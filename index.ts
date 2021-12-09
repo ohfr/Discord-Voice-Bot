@@ -75,7 +75,19 @@ client.on('speech', async (msg: VoiceMessage) => {
     }
 
     if (msg.content?.includes('tell')) {
-        // create a message to type to a member
+        // create a message to send to a member
+
+        const personToSendTo = msg.content.split(' ')[1];
+        const indexIgnore = msg.content.lastIndexOf(personToSendTo);
+        const message = msg.content.substring(personToSendTo.length+indexIgnore+1, msg.content.length);
+
+        if (personToSendTo) {
+            const member = lookup(msg, personToSendTo);
+
+            if (member) {
+                member.send(message);
+            }
+        }
     }
 });
 
