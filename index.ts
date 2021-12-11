@@ -60,6 +60,11 @@ client.on('speech', async (msg: VoiceMessage) => {
         const personToKick = msg.content.split(' ')[1];
 
         if (personToKick) {
+            if (personToKick === 'me') {
+                msg.member?.edit({
+                    channel: null
+                });
+            }
             const member = lookup(msg, personToKick);
             if (member) {
                 member.edit({
